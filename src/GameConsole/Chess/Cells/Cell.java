@@ -14,9 +14,9 @@ public class Cell {
         this.locationPoint = locationPoint;
         this.isOccupied = false;
     }
-    public void init(){
+    public void reset(){
         this.isOccupied = false;
-        this.currentPiece = null;
+
 
     }
 

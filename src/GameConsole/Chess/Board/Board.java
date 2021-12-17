@@ -40,10 +40,9 @@ import java.util.Map;
 public class Board {
     private static final Integer BOARD_LENGTH = 8;
     private final Map<LocationPoint, Cell> locationPointCellMap;
-
-    Cell[][] boardCells = new Cell[BOARD_LENGTH][BOARD_LENGTH];
     private final List<absPiece> whitePieces = new ArrayList<>();
     private final List<absPiece> blackPieces = new ArrayList<>();
+    Cell[][] boardCells = new Cell[BOARD_LENGTH][BOARD_LENGTH];
 
 
     public Board() {
@@ -60,7 +59,7 @@ public class Board {
                     newCell.setCurrentPiece(piece);
                     newCell.setOccupied(true);
                     piece.setCurrentCell(newCell);
-                    if (piece.getPieceColor().equals(PieceColor.BLACK)){
+                    if (piece.getPieceColor().equals(PieceColor.BLACK)) {
                         blackPieces.add(piece);
                     } else {
                         whitePieces.add(piece);
@@ -80,17 +79,18 @@ public class Board {
         return locationPointCellMap;
     }
 
-    public List<absPiece> getWhitePieces(){
+    public List<absPiece> getWhitePieces() {
         return whitePieces;
     }
-    public List<absPiece> getBlackPieces(){
+
+    public List<absPiece> getBlackPieces() {
         return blackPieces;
     }
 
     public void printBoard() {
         for (int i = 0; i < boardCells.length; i++) {
             System.out.print(BOARD_LENGTH - i + " ");
-            for (int j = 0; j < boardCells.length; j++) {
+            for (int j = 0; j < boardCells[i].length; j++) {
                 if (boardCells[i][j].isOccupied()) {
                     absPiece piece = boardCells[i][j].getCurrentPiece();
                     System.out.print(piece.getPieceName().charAt(0) + " ");
@@ -101,10 +101,9 @@ public class Board {
             }
             System.out.println();
         }
-        System.out.print(" ");
+        System.out.println();
         for (File file : File.values()) {
             System.out.print(file.name() + " ");
-
         }
         System.out.println();
     }

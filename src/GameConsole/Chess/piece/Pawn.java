@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 
 public class Pawn extends absPiece implements Movable {
-    private boolean isFirstMove = true;
+    private final boolean isFirstMove = true;
 
     public Pawn(PieceColor pieceColor) {
         super(pieceColor);
