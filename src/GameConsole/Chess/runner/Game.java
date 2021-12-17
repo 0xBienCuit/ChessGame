@@ -33,31 +33,26 @@ public class Game {
             String[] fromTo = line.split("->");
             File fromFile = File.valueOf(String.valueOf(Character.toUpperCase(fromTo[0].charAt(0))));
             int fromPoint = Integer.parseInt(String.valueOf(fromTo[0].charAt(1)));
-            File toPoint = File.valueOf(String.valueOf(Character.toUpperCase(fromTo[1].charAt(0))));
-            int toFile = Integer.parseInt(String.valueOf(fromTo[1].charAt(1)));
+            File toFile = File.valueOf(String.valueOf(Character.toUpperCase(fromTo[1].charAt(0))));
+            int toPoint = Integer.parseInt(String.valueOf(fromTo[1].charAt(1)));
 
 
 
+            Cell fromCl = board.getLocationPointCellMap().get(new LocationPoint(fromFile, fromPoint));
+            Cell toCl = board.getLocationPointCellMap().get(new LocationPoint(toFile, toPoint));
 
-
-
-
-
-            Cell SrcDest = board.getLocationPointCellMap().get(new LocationPoint(fromFile, fromPoint));
-            Cell dstSrc = board.getLocationPointCellMap().get(new LocationPoint(fromFile, fromPoint));
-            SrcDest.getCurrentPiece().doMove(dstSrc);
-
+            fromCl.getCurrentPiece().doMove(toCl);
+            fromCl.reset();
+            fromCl.setCurrentPiece(null);
 
 
             board.printBoard();
 
 
         }
-
-
     }
 
-    public static void printPiece(Movable piece, Board board) {
+    public static void printPiece(Movable piece) {
         piece.getValidMoves(null);
     }
 

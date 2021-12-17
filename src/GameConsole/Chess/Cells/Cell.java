@@ -35,7 +35,7 @@ public class Cell {
     }
 
     public void setOccupied(boolean occupied) {
-        isOccupied = occupied;
+        this.isOccupied = occupied; //bij aanroep is false en vice versa
     }
 
     public LocationPoint getLocationPoint() {
