@@ -24,6 +24,8 @@ public class King extends absPiece implements Movable{
 
     @Override
     public void doMove(Cell cell) {
+        cell.setOccupied(true);
+        cell.setCurrentPiece(this);
 
     }
 }

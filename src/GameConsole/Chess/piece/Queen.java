@@ -43,9 +43,8 @@ public class Queen extends absPiece implements Movable {
 
     @Override
     public void doMove(Cell cell) {
-        Cell currentCell = this.getCurrentCell();
-        this.setCurrentCell(cell);
-        currentCell.reset();
+        cell.setOccupied(true);
+        cell.setCurrentPiece(this);
 
     }
 }

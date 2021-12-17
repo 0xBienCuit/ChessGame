@@ -55,11 +55,6 @@ public class Pawn extends absPiece implements Movable {
     public void doMove(Cell cell) {
         cell.setOccupied(true);
         cell.setCurrentPiece(this);
-        //null pointer error want wist niks
-
-        //cell wel bezet
-        //bij debuggen gemerkt dat dit niet veranderdde
-        //nu wel want expliciet meegegeven
 
 
     }
