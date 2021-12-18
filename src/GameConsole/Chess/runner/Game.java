@@ -27,13 +27,14 @@ public class Game {
         Board board = new Board();
 
         board.printBoard();
-        //board.getWhitePieces().forEach(System.out::println);
+        board.getWhitePieces().forEach(System.out::println);
 
         Scanner sc = new Scanner(System.in);
 
 
 
         while(true){
+        //clear console
         String line = sc.nextLine();
 
         String[] fromTo = line.split("->");
