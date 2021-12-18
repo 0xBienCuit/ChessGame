@@ -7,9 +7,11 @@ import GameConsole.Chess.Cells.LocationPointGenerator;
 import GameConsole.Chess.Coordinates.LocationPoint;
 
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
+import javax.xml.stream.Location;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -25,24 +27,50 @@ public class Pawn extends absPiece implements Movable {
     public List<LocationPoint> getValidMoves(Board board) {
         List<LocationPoint> moveCandidates = new ArrayList<>(Collections.emptyList());
         LocationPoint current = this.getCurrentCell().getLocationPoint();
-        if (isFirstMove) {
         moveCandidates.add(LocationPointGenerator
-                .build(this.getCurrentCell().getLocationPoint(), 0, 1));
+                .build(current, 0, 1));
+        if (isFirstMove) {
             moveCandidates.add(LocationPointGenerator
-                    .build(this.getCurrentCell().getLocationPoint(), 0, 2));
+                    .build(current, 0, 2));
+            return moveCandidates;
         }
 
         moveCandidates.add(LocationPointGenerator.build(current, 1, 1));
-        moveCandidates.add(LocationPointGenerator.build(this.getCurrentCell().getLocationPoint(), -1, 1));
+        moveCandidates.add(LocationPointGenerator.build(current, -1, 1));
+        Map<LocationPoint, Cell> cellMap = board.getLocationPointCellMap();
 
+        List<LocationPoint> validMoves = moveCandidates.stream()
+                .filter((candidate) -> (board.getLocationPointCellMap().containsKey(candidate)))
+                .collect(Collectors.toList());
+        //if piece other color --> cancapture
+        //piece directly in front of it !! toCapture
 
+        return validMoves.stream().filter((candidate) -> {
+            //make sure candidate move ne piece color
+            //verify no piece in front of pawn
+            if (candidate
+                    .getFile()
+                    .equals(this.getCurrentCell()
+                            .getLocationPoint()
+                            .getFile()) && cellMap.get(candidate)
+                    .isOccupied()) {
+                return false;
 
+            }
 
-        List<LocationPoint> validMoves = moveCandidates.stream().filter((candidate) -> {
-            return (board.getLocationPointCellMap().containsKey(candidate));
+            return !cellMap.get(candidate)
+                    .getCurrentPiece().pieceColor
+                    .equals(this.getPieceColor());
         }).collect(Collectors.toList());
 
-        return moveCandidates;
+
+        /**
+         * in Essence:
+         *  -Calculating all possible Moves
+         *  -Filtering out moves non existant on board
+         *  -Filtering even more based on piece specific logic
+         */
+
     }
 
     @Override

@@ -71,6 +71,7 @@ public class Board {
                 currentColor = (currentColor == CellColor.BLACK) ? CellColor.WHITE : CellColor.BLACK;
                 column++;
             }
+
         }
     }
 
@@ -101,7 +102,7 @@ public class Board {
             }
             System.out.println();
         }
-        System.out.println();
+        String.format("12%n");
         for (File file : File.values()) {
             System.out.print(file.name() + " ");
         }
