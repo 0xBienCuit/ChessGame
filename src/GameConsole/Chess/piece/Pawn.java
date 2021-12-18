@@ -26,22 +26,18 @@ public class Pawn extends absPiece implements Movable {
     @Override
     public List<LocationPoint> getValidMoves(Board board) {
         List<LocationPoint> moveCandidates = new ArrayList<>(Collections.emptyList());
+        Map<LocationPoint, Cell> cellMap = board.getLocationPointCellMap();
         LocationPoint current = this.getCurrentCell().getLocationPoint();
-        moveCandidates.add(LocationPointGenerator
-                .build(current, 0, 1));
+        moveCandidates.add(LocationPointGenerator.build(current, 0, 1));
         if (isFirstMove) {
-            moveCandidates.add(LocationPointGenerator
-                    .build(current, 0, 2));
+            moveCandidates.add(LocationPointGenerator.build(current, 0, 2));
             return moveCandidates;
         }
 
         moveCandidates.add(LocationPointGenerator.build(current, 1, 1));
         moveCandidates.add(LocationPointGenerator.build(current, -1, 1));
-        Map<LocationPoint, Cell> cellMap = board.getLocationPointCellMap();
 
-        List<LocationPoint> validMoves = moveCandidates.stream()
-                .filter((candidate) -> (board.getLocationPointCellMap().containsKey(candidate)))
-                .collect(Collectors.toList());
+        List<LocationPoint> validMoves = moveCandidates.stream().filter((candidate) -> (board.getLocationPointCellMap().containsKey(candidate))).collect(Collectors.toList());
         //if piece other color --> cancapture
         //piece directly in front of it !! toCapture
 

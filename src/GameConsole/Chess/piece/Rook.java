@@ -29,11 +29,11 @@ public class Rook extends absPiece implements Movable {
         return moveCandidates;
     }
 
-    private void getPointCandidates(List<LocationPoint> moveCandidates, Map<LocationPoint, Cell> cellMap, LocationPoint current, int offset){
-        LocationPoint next = LocationPointGenerator.build(current,current.getFile().ordinal(), 0);
-        while (cellMap.containsKey(next)){
-            if (cellMap.get(next).isOccupied()){
-                if (cellMap.get(next).getCurrentPiece().pieceColor.equals(this.pieceColor)){
+    private void getPointCandidates(List<LocationPoint> moveCandidates, Map<LocationPoint, Cell> cellMap, LocationPoint current, int offset) {
+        LocationPoint next = LocationPointGenerator.build(current, current.getFile().ordinal(), 0);
+        while (cellMap.containsKey(next)) {
+            if (cellMap.get(next).isOccupied()) {
+                if (cellMap.get(next).getCurrentPiece().pieceColor.equals(this.pieceColor)) {
                     break;
                 }
                 moveCandidates.add(next);
@@ -44,11 +44,11 @@ public class Rook extends absPiece implements Movable {
         }
     }
 
-    private void getFileCandidates(List<LocationPoint> moveCandidates, Map<LocationPoint, Cell> cellMap, LocationPoint current, int offset){
+    private void getFileCandidates(List<LocationPoint> moveCandidates, Map<LocationPoint, Cell> cellMap, LocationPoint current, int offset) {
         LocationPoint next = LocationPointGenerator.build(current, offset, 0);
-        while (cellMap.containsKey(next)){
-            if (cellMap.get(next).isOccupied()){
-                if (cellMap.get(next).getCurrentPiece().pieceColor.equals(this.pieceColor)){
+        while (cellMap.containsKey(next)) {
+            if (cellMap.get(next).isOccupied()) {
+                if (cellMap.get(next).getCurrentPiece().pieceColor.equals(this.pieceColor)) {
                     break;
                 }
                 moveCandidates.add(next);
@@ -62,7 +62,15 @@ public class Rook extends absPiece implements Movable {
 
     @Override
     public List<LocationPoint> getValidMoves(Board board, Cell cell) {
-        return null;
+        List<LocationPoint> moveCandidates = new ArrayList<>();
+        Map<LocationPoint, Cell> cellMap = board.getLocationPointCellMap();
+        LocationPoint current = cell.getLocationPoint();
+        getFileCandidates(moveCandidates, cellMap, current, -1);
+        getFileCandidates(moveCandidates, cellMap, current, 1);
+        getPointCandidates(moveCandidates, cellMap, current, -1);
+        getPointCandidates(moveCandidates, cellMap, current, 1);
+        return moveCandidates;
+
     }
 
     @Override
