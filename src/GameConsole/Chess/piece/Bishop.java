@@ -21,10 +21,10 @@ public class Bishop extends absPiece implements Movable{
         List<LocationPoint> moveCandidates = new ArrayList<>();
         Map<LocationPoint, Cell> cellMap = board.getLocationPointCellMap();
         LocationPoint current = this.getCurrentCell().getLocationPoint();
-        getMoves(moveCandidates, cellMap, current, 1, 1);
-        getMoves(moveCandidates, cellMap, current, 1, -1);
-        getMoves(moveCandidates, cellMap, current, -1, -1);
-        getMoves(moveCandidates, cellMap, current, -1, 1);
+        getMoves(moveCandidates, cellMap, current, 1, 1); // up & to right
+        getMoves(moveCandidates, cellMap, current, 1, -1); //up & to left
+        getMoves(moveCandidates, cellMap, current, -1, -1); //down & to left
+        getMoves(moveCandidates, cellMap, current, -1, 1); // down & to right
 
         return moveCandidates;
 

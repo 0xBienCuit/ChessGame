@@ -21,8 +21,8 @@ public class Rook extends absPiece implements Movable {
         List<LocationPoint> moveCandidates = new ArrayList<>();
         Map<LocationPoint, Cell> cellMap = board.getLocationPointCellMap();
         LocationPoint current = this.getCurrentCell().getLocationPoint();
-        getFileCandidates(moveCandidates, cellMap, current, -1);
-        getFileCandidates(moveCandidates, cellMap, current, 1);
+        getFileCandidates(moveCandidates, cellMap, current, -1); // rook can only move up and down or latterly
+        getFileCandidates(moveCandidates, cellMap, current, 1); //
         getPointCandidates(moveCandidates, cellMap, current, -1);
         getPointCandidates(moveCandidates, cellMap, current, 1);
 
@@ -30,17 +30,18 @@ public class Rook extends absPiece implements Movable {
     }
 
     private void getPointCandidates(List<LocationPoint> moveCandidates, Map<LocationPoint, Cell> cellMap, LocationPoint current, int offset) {
-        LocationPoint next = LocationPointGenerator.build(current, current.getFile().ordinal(), 0);
+        LocationPoint next = LocationPointGenerator.build(current, current.getFile().ordinal(), 0); //keep file fixed, but add offset on each iteration of loop
         while (cellMap.containsKey(next)) {
+            // --> if occupied == true, check to see piece that its occupying the cell is same color, if true we break out of loop, else we add to list of potential moves
             if (cellMap.get(next).isOccupied()) {
                 if (cellMap.get(next).getCurrentPiece().pieceColor.equals(this.pieceColor)) {
-                    break;
+                    break; // break because we can't move past another cell
                 }
                 moveCandidates.add(next);
                 break;
             }
             moveCandidates.add(next);
-            next = LocationPointGenerator.build(next, offset, 0);
+            next = LocationPointGenerator.build(next, next.getFile().ordinal(), 0); //update next to include new current position and adding the new offset to file | point stays constant
         }
     }
 
@@ -55,7 +56,7 @@ public class Rook extends absPiece implements Movable {
                 break;
             }
             moveCandidates.add(next);
-            next = LocationPointGenerator.build(next, -1, 0);
+            next = LocationPointGenerator.build(next, offset, 0);
         }
 
     }
