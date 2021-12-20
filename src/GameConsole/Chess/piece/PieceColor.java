@@ -1,6 +1,14 @@
 package GameConsole.Chess.piece;
 
 public enum PieceColor {
-    WHITE,
-    BLACK
+    BLACK("b"),WHITE("w");
+    String name;
+
+    PieceColor(String name){
+        this.name = name;
+    }
+
+    public String getColorName() {
+        return name;
+    }
 }
