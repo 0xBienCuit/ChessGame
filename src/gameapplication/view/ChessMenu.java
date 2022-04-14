@@ -9,10 +9,10 @@ import javafx.scene.control.MenuItem;
  */
 public class ChessMenu extends MenuBar {
     // Creating the menu items.
-    private MenuItem miInstructions;
+    private final MenuItem miInstructions;
+    private final MenuItem miRestart;
     private MenuItem miLoad;
     private MenuItem miSave;
-    private MenuItem miRestart;
 
     public ChessMenu() {
         // This is creating the menu items.
@@ -33,6 +33,10 @@ public class ChessMenu extends MenuBar {
 
     }
 
+    public MenuItem getMiLoad() {
+        return miLoad;
+    }
+
     /**
      * It sets the value of the miLoad MenuItem to the value of the miLoad MenuItem passed in.
      *
@@ -42,16 +46,12 @@ public class ChessMenu extends MenuBar {
         this.miLoad = miLoad;
     }
 
-    public void setMiSave(MenuItem miSave) {
-        this.miSave = miSave;
-    }
-
-    public MenuItem getMiLoad() {
-        return miLoad;
-    }
-
     public MenuItem getMiSave() {
         return miSave;
+    }
+
+    public void setMiSave(MenuItem miSave) {
+        this.miSave = miSave;
     }
 
     public MenuItem getMiInstructions() {

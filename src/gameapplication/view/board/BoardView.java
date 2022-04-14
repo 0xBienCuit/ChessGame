@@ -1,241 +1,445 @@
-/**
- * This class is the view of the board. It is responsible for displaying the board and the pieces
- */
-
-
 package gameapplication.view.board;
 
-import gameapplication.view.ChessMenu;
-import gameapplication.view.board.components.ChessBoard;
-import gameapplication.view.board.components.PieceComp;
-import gameapplication.view.board.components.Space;
-import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Group;
+
+import gameapplication.model.*;
+import gameapplication.model.chess.ChessBoard;
+import gameapplication.model.chess.ChessPiece;
+import gameapplication.statecontrol.*;
+import gameapplication.view.menu.MenuView;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
+import javafx.geometry.HPos;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
+import javafx.scene.control.ButtonType;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
+
+/**
+ * A class for a view for a chess board. This class must have a reference
+ * to a GameController for chess playing chess
+ *
+ * @author Nicolas Bouquiaux
+ */
 public class BoardView extends BorderPane {
-    // This is initialising the board and the buttons from the Space class.
-    public Button[][] buttons = new Button[8][8];
-    private Space[][] space;
-    private final List<Space> validMovesSpaces;
-    private final List<Space> validAttackSpaces;
-    private final List<Space> clickedSpace;
-    public Space activeSpace = null;
+
+    /* You may add more instance data if you need it */
+    protected GameController controller;
+    private GridPane gridPane;
+    private Tile[][] tiles = new Tile[8][8];
+
+    public MenuView getMenuView() {
+        return menuView;
+    }
+
+    private MenuView menuView;
+    private Text sideStatus;
+    private Text state;
+    private boolean isRotated;
+    private boolean click = false;
+    private Tile origin;
     public ChessBoard board;
-    private ChessMenu chessMenu;
-    private Button btnSettings;
-    private Button btnInstructions;
-    private Button btnSave;
+    private Button reset;
 
-
-    // This is initialising the pieces from the model.
-    private PieceComp[][] piecesFromModel;
-    // This is initialising the playerIsWhite boolean to true.
-    private boolean playerIsWhite;
-
-    /**
-     * Returns the chess menu
-     *
-     * @return The chess menu.
-     */
-    public ChessMenu getChessMenu() {
-        return chessMenu;
-    }
-
-    /**
-     * Returns the group that contains the board
-     *
-     * @return The boardGroup object.
-     */
-    public Group getBoardGroup() {
-        return boardGroup;
-    }
-
-    // This is returning the bounds of the game.
-    public Bounds getGameBounds() {
-        return gameBounds;
-    }
-
-    private Group boardGroup;
-    private Bounds gameBounds;
-    private TextField tfPath;
-    private Label playerName1;
-    private Label playerName2;
-
-    private HBox HBoxGameOver;
-    private Button restartGame;
-
+    private Button playAI;
+    private HBox play;
 
     public BoardView() {
         initialiseNodes();
         layoutNodes();
-        validMovesSpaces = new ArrayList<>();
-        validAttackSpaces = new ArrayList<>();
-        clickedSpace = new ArrayList<>();
-
 
     }
 
-    /**
-     * This function returns the button object that is named "btnSave"
-     *
-     * @return A button.
-     */
-    public Button getBtnSave() {
-        return btnSave;
-    }
-
-    /**
-     * Returns the text field that contains the path to the file
-     *
-     * @return A TextField object.
-     */
-    public TextField getTfPath() {
-        return tfPath;
-    }
-
-
-
-    /**
-     * Returns the 2D array of spaces
-     *
-     * @return The method returns the space array.
-     */
-    public Space[][] getSpace() {
-        return space;
-    }
-
-    /**
-     * This function initialises the board and the space
-     */
     private void initialiseNodes() {
-        // This is initialising the board and the space.
-        board = new ChessBoard(playerIsWhite);
-        // This is initialising the button array.
-        space = new Space[8][8];
+        this.controller = new ChessController();
+        this.state = new Text();
 
-        // This is initialising the player names and the restart game button.
-        playerName1 = new Label("Player1");
-        playerName2 = new Label("Player2");
-        restartGame = new Button("Restart game");
-
-        HBoxGameOver = new HBox();
+        this.sideStatus = new Text();
+        reset = new Button("Reset");
+        playAI = new Button("Play AI");
+        play = new HBox(10);
+        tiles = new Tile[8][8];
+        gridPane = new GridPane();
+        menuView = new MenuView();
 
 
     }
 
-
-    /**
-     * This function is initialising the chess menu and setting the top of the border pane to the chess menu
-     */
-    private void layoutNodes() {
-        // This is initialising the chess menu and setting the top of the border pane to the chess menu.
-        chessMenu = new ChessMenu();
-        super.setTop(this.getChessMenu());
-        Label gameOver = new Label("Game Over. 😘");
-        gameOver.setFont(new Font(22));
-
-
-        // This is adding the game over label and the restart game button to the HBoxGameOver object.
-        HBoxGameOver.getChildren().addAll(gameOver, restartGame);
-        // This is making the HBoxGameOver object invisible.
-        HBoxGameOver.setVisible(false);
-        // This is setting the alignment of the HBoxGameOver object to center and the spacing to 20.
-        HBoxGameOver.setAlignment(Pos.CENTER);
-        HBoxGameOver.setSpacing(20);
-
-
-        // This is setting the alignment of the VBox to center and the spacing to 10.
-        VBox vbox = new VBox();
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setSpacing(10);
-        // This is setting the margin of the VBox object to 10.
-        BorderPane.setMargin(vbox, new Insets(10));
-        playerName1.setFont(new Font(18));
-        playerName2.setFont(new Font(18));
-
-
-        // This is adding the game over label and the restart game button to the HBoxGameOver object.
-        //         This is making the HBoxGameOver object invisible.
-        //         This is setting the alignment of the HBoxGameOver object to center and the spacing to 20.
-        //         This is setting the alignment of the VBox to center and the spacing to 10.
-        //         This is setting the margin of the VBox object to 10.
-        //         This is setting the top of the border pane to the chess menu.
-        //         This is setting the center of the border pane to the VBox object.
-        vbox.getChildren().addAll(HBoxGameOver, playerName2, board, playerName1);
-        super.setCenter(vbox);
+    public Button getReset() {
+        return reset;
     }
 
+    public Button getPlayAI() {
+        return playAI;
+    }
 
-    // The getActiveSpace() method returns the active space.
-    //         The getValidMovesSpaces() method returns the valid moves spaces.
-    //         The setValidMovesSpaces() method adds the valid moves spaces to the validMovesSpaces list.
-    //         The getValidAttackSpaces() method returns the valid attack spaces.
-    //         The setValidAttackSpaces() method adds the valid attack spaces to the validAttackSpaces list.
-    //         The getClickedSpace() method returns the        The getHBoxGameOver() method returns the HBoxGameOver
-    // object.
-    //         The getRestartGameButton() method returns the restart game button.
-    //         The isPlayerIsWhite() method returns the playerIsWhite boolean.
-    //         The getBoard() method returns the board.
-    //         The getActiveSpace() method returns the active space.
-    //         The getValidMovesSpaces() method returns the valid moves spaces.
-    //         The getValidAttackSpaces() method returns the valid attack spaces.
-    //         The getClickedSpace() method returns the clicked space.
-    //         The getHBoxGameOver() method returns the HBoxGameOver object
-
-    public Space getActiveSpace() {
-        return activeSpace;
-    }
-    public List<Space> getValidMovesSpaces() {
-        return validMovesSpaces;
-    }
-    public void setValidMovesSpaces(Space validMovesSpace) {
-        this.validMovesSpaces.add(validMovesSpace);
-    }
-    public List<Space> getValidAttackSpaces() {
-        return validAttackSpaces;
-    }
-    public List<Space> getClickedSpace() {
-        return clickedSpace;
-    }
-    public void setValidAttackSpaces(Space validAttackSpace) {
-        validAttackSpaces.add(validAttackSpace);
-    }
-    public void clearValidMovesSpaces() {
-        this.validMovesSpaces.clear();
-    }
-    public void clearAttackSpaces() {
-        this.validAttackSpaces.clear();
-    }
-    public void setPlayerName1(String name) {
-        this.playerName1.setText(name);
-    }
-    public void setPlayerName2(String name) {
-        this.playerName2.setText(name);
+    public HBox getPlay() {
+        return play;
     }
     public ChessBoard getBoard() {
         return board;
     }
-    public boolean isPlayerIsWhite() {
-        return playerIsWhite;
+    private void layoutNodes() {
+        play.getChildren().addAll(reset, playAI);
+        super.setBottom(play);
+        super.setTop(getMenuView());
+        gridPane.setStyle("-fx-background-color : goldenrod;");
+
+
+        VBox root = new VBox(10);
+
+        super.setCenter(gridPane);
+
+
     }
-    public HBox getHBoxGameOver() {
-        return HBoxGameOver;
+
+    /**
+     * Listener for clicks on a tile
+     *
+     * @param tile The tile attached to this listener
+     * @return The event handler for all tiles.
+     */
+
+    private EventHandler<? super MouseEvent> tileListener(Tile tile) {
+        return event -> {
+            //not your turn!
+            if (controller instanceof NetworkedChessController) {
+                controller.getCurrentSide();
+            }
+
+            // Don't change the code above this :)
+            // call firstClick or secondClick, depending on which it is
+            try {
+                if (!this.click) {
+                    this.click = true;
+                    firstClick(tile);
+                } else if (this.click) {
+                   event = null;
+                    this.click = false;
+                    secondClick(tile);
+                }
+            } catch (IllegalMoveException e) {
+                System.out.println("Temp");
+            }
+        };
     }
-    public Button getRestartGameButton() {
-        return restartGame;
+
+    /**
+     * Perform the first click functions, like displaying
+     * which are the valid moves for the piece you clicked.
+     *
+     * @param tile The TileView that was clicked
+     */
+    private void firstClick(Tile tile) {
+        // TODO
+        this.origin = tile;
+        Color color = Color.LIGHTGREEN;
+        Color capture = Color.DARKSALMON;
+        Set<Move> moves = controller.getMovesForPieceAt(tile.getPosition());
+        if (moves.size() > 0) {
+            for (Move m : moves) {
+                Position pos = m.getDestination();
+                Tile x = this.getTileAt(pos);
+                x.highlight(capture);
+                if (controller.moveResultsInCapture(m)) {
+                    x.highlight(capture);
+                }
+            }
+            Color highlight = Color.PALEGOLDENROD;
+            tile.highlight(highlight);
+        }
     }
+
+    /**
+     * Perform the second click functions, like
+     * sending moves to the controller but also
+     * checking that the user clicked on a valid position.
+     * If they click on the same piece they clicked on for the first click
+     * then you should reset to click state back to the first click and clear
+     * the highlighting effected on the board.
+     *
+     * @param tile the TileView at which the second click occurred
+     */
+    private void secondClick(Tile tile) throws IllegalMoveException {
+        // TODO
+        Set<Move> moves = controller.getMovesForPieceAt(origin.getPosition());
+        Position destination = tile.getPosition();
+        if (origin.getPosition().equals(destination)) {
+            origin.clear();
+            for (Move x : moves) {
+                Position pos = x.getDestination();
+                this.getTileAt(pos).clear();
+            }
+        } else {
+            for (Move m : moves) {
+                Position pos = m.getDestination();
+                if (destination.equals(pos)) {
+                    try {
+                        controller.makeMove(m);
+                        controller.endTurn();
+                        controller.beginTurn();
+                    } catch (IllegalMoveException e) {
+                        throw new IllegalMoveException(m);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * This method should be called any time a move is made on the back end.
+     * It should update the tiles' highlighting and symbols to reflect the
+     * change in the board state.
+     *
+     * @param moveMade          the move to show on the view
+     * @param capturedPositions a list of positions where pieces were captured
+     */
+    public void updateView(Move moveMade, List<Position> capturedPositions) {
+        // TODO
+        Color previous = Color.NAVAJOWHITE;
+        Position start = moveMade.getStart();
+        Position end = moveMade.getDestination();
+
+        for (Tile[] tile : tiles) {
+            for (Tile t : tile) {
+                t.clear();
+                Position current = t.getPosition();
+                this.getTileAt(start).highlight(previous);
+                this.getTileAt(end).highlight(previous);
+                t.setSymbol(controller.getSymbolForPieceAt(current));
+            }
+        }
+    }
+
+    /**
+     * Asks the user which PieceType they want to promote to
+     * (suggest using Alert). Then it returns the Piecetype user selected.
+     *
+     * @return the PieceType that the user wants to promote their piece to
+     */
+    private ChessPiece.ChessPieceType handlePromotion() {
+        // TODO
+        ChessPiece.ChessPieceType type = ChessPiece.ChessPieceType.PAWN;
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Promotion");
+        alert.setHeaderText("Your pawn has earned a promotion!");
+        alert.setContentText("What would you like to promote to?");
+        ButtonType queen = new ButtonType("Queen");
+        ButtonType knight = new ButtonType("Knight");
+        ButtonType rook = new ButtonType("Rook");
+        ButtonType bishop = new ButtonType("Bishop");
+        alert.getButtonTypes().setAll(queen, knight, rook, bishop);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == queen) {
+            type = ChessPiece.ChessPieceType.QUEEN;
+        } else if (result.isPresent() && result.get() == knight) {
+            type = ChessPiece.ChessPieceType.KNIGHT;
+        } else if (result.isPresent() && result.get() == rook) {
+            type = ChessPiece.ChessPieceType.ROOK;
+        } else if (result.isPresent() && result.get() == bishop) {
+            type = ChessPiece.ChessPieceType.BISHOP;
+        }
+        return type;
+    }
+
+    /**
+     * Handles a change in the GameState (ie someone in check or stalemate).
+     * If the game is over, it should open an Alert and ask to keep
+     * playing or exit.
+     *
+     * @param s The new Game State
+     */
+    public void handleGameStateChange(GameState s) {
+        // TODO
+        if (s.equals(ChessState.BLACK_IN_CHECK)) {
+            s = ChessState.WHITE_WINS;
+        } else if (s.equals(ChessState.WHITE_IN_CHECK)) {
+            s = ChessState.BLACK_WINS;
+        }
+        this.state.setText(s.toString());
+        if (s.isGameOver()) {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Game Over");
+            alert.setHeaderText("Result:  " + s.toString());
+            alert.setContentText("Continue playing or Exit?");
+
+            ButtonType cont = new ButtonType("Continue");
+            ButtonType exit = new ButtonType("Exit");
+            alert.getButtonTypes().setAll(cont, exit);
+            alert.showAndWait().ifPresent(response -> {
+                if (response == cont) {
+                    this.controller = new ChessController();
+                    this.reset(this.controller);
+                } else {
+                    Alert alertToSave = new Alert(AlertType.INFORMATION);
+                    alertToSave.setTitle("Would you like to save your game?");
+                    alertToSave.setHeaderText("Save Game");
+                    alertToSave.setContentText("Would you like to save your game?");
+
+                    ButtonType save = new ButtonType("Save");
+                    ButtonType noSave = new ButtonType("Don't Save");
+                    alert.getButtonTypes().setAll(save, noSave);
+                    alertToSave.showAndWait().ifPresent(responseToSave -> {
+                        if (responseToSave == save) {
+                            //TODO
+                        } else {
+                            Platform.exit();
+                        }
+                    });
+
+
+                }
+            });
+        }
+    }
+
+    /**
+     * Updates UI that depends upon which Side's turn it is
+     *
+     * @param s The new Side whose turn it currently is
+     */
+    public void handleSideChange(Side s) {
+        // TODO
+        this.sideStatus.setText(s.toString() + "'s" + " Turn");
+    }
+
+    /**
+     * Resets this BoardView with a new controller.
+     * This moves the chess pieces back to their original configuration
+     * and calls startGame() at the end of the method
+     *
+     * @param newController The new controller for this BoardView
+     */
+    public void reset(GameController newController) {
+        if (controller instanceof NetworkedChessController) {
+            ((NetworkedChessController) controller).close();
+        }
+        controller = newController;
+        isRotated = false;
+        if (controller instanceof NetworkedChessController) {
+            Side mySide = ((NetworkedChessController) controller).getLocalSide();
+            if (mySide == Side.BLACK) {
+                isRotated = true;
+            }
+        }
+        sideStatus.setText(controller.getCurrentSide() + "'s Turn");
+
+        // controller event handlers
+        // We must force all of these to run on the UI thread
+        controller.addMoveListener(
+                (Move move, List<Position> capturePositions) ->
+                        Platform.runLater(
+                                () -> updateView(move, capturePositions)));
+
+        controller.addCurrentSideListener(
+                (Side side) -> Platform.runLater(
+                        () -> handleSideChange(side)));
+
+        controller.addGameStateChangeListener(
+                (GameState state) -> Platform.runLater(
+                        () -> handleGameStateChange(state)));
+
+        controller.setPromotionListener(() -> handlePromotion());
+
+
+        addPieces();
+        controller.startGame();
+        if (isRotated) {
+            setBoardRotation(180);
+        } else {
+            setBoardRotation(0);
+        }
+    }
+
+    /**
+     * Initializes the gridPane object with the pieces from the GameController.
+     * This method should only be called once before starting the game.
+     */
+    private void addPieces() {
+        gridPane.getChildren().clear();
+        Map<Piece, Position> pieces = controller.getAllActivePiecesPositions();
+        /* Add the tiles */
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Tile tile = new TileView(new Position(row, col));
+                gridPane.add(tile.getRootNode(),
+                        1 + tile.getPosition().getCol(),
+                        1 + tile.getPosition().getRow());
+                GridPane.setHgrow(tile.getRootNode(), Priority.ALWAYS);
+                GridPane.setVgrow(tile.getRootNode(), Priority.ALWAYS);
+                getTiles()[row][col] = tile;
+                tile.getRootNode().setOnMouseClicked(
+                        tileListener(tile));
+                tile.clear();
+                tile.setSymbol("");
+            }
+        }
+        /* Add the pieces */
+        for (Piece p : pieces.keySet()) {
+            Position placeAt = pieces.get(p);
+            getTileAt(placeAt).setSymbol(p.getType().getSymbol(p.getSide()));
+        }
+        /* Add the coordinates around the perimeter */
+        for (int i = 1; i <= 8; i++) {
+            Text coord1 = new Text((char) (64 + i) + "");
+            GridPane.setHalignment(coord1, HPos.CENTER);
+            gridPane.add(coord1, i, 0);
+
+            Text coord2 = new Text((char) (64 + i) + "");
+            GridPane.setHalignment(coord2, HPos.CENTER);
+            gridPane.add(coord2, i, 9);
+
+            Text coord3 = new Text(9 - i + "");
+            GridPane.setHalignment(coord3, HPos.CENTER);
+            gridPane.add(coord3, 0, i);
+
+            Text coord4 = new Text(9 - i + "");
+            GridPane.setHalignment(coord4, HPos.CENTER);
+            gridPane.add(coord4, 9, i);
+        }
+    }
+
+    private void setBoardRotation(int degrees) {
+        gridPane.setRotate(degrees);
+        for (Node n : gridPane.getChildren()) {
+            n.setRotate(degrees);
+        }
+    }
+
+    /**
+     * Gets the view to add to the scene graph
+     *
+     * @return A pane that is the node for the chess board
+     */
+    public Pane getView() {
+        return gridPane;
+    }
+
+    /**
+     * Gets the tiles that belong to this board view
+     *
+     * @return A 2d array of TileView objects
+     */
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+
+    public Tile getTileAt(int row, int col) {
+        return getTiles()[row][col];
+    }
+
+    private Tile getTileAt(Position p) {
+        return getTileAt(p.getRow(), p.getCol());
+    }
+
 }
-
-

@@ -1,10 +1,17 @@
 package gameapplication;
 
-import gameapplication.model.Chess;
-import gameapplication.view.start.StartPresenter;
-import gameapplication.view.start.StartView;
+
+import gameapplication.statecontrol.GameController;
+import gameapplication.view.board.BoardPresenter;
+import gameapplication.view.board.BoardView;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 /**
@@ -12,6 +19,10 @@ import javafx.stage.Stage;
  *
  * @author Nicolas Bouquiaux
  * @version 1.0
+ * @author nicolas Bouquiaux
+ * @author nicolas Bouquiaux
+ * @author nicolas Bouquiaux
+ * @author nicolas Bouquiaux
  */
 
 /**
@@ -24,24 +35,35 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
 
+    private GameController controller;
+    private BoardView board;
+    private Text state;
+    private Text sideStatus;
+    private VBox root;
+//    private final Logic logic = new Logic();
+    private final int size = 8;
 
     public static void main(String[] args) {
         launch(args);
     }
 
 
-
     @Override
     public void start(Stage primaryStage) throws Exception {
+        BorderPane border = new BorderPane();
+        HBox control = new HBox();
+        control.setPrefHeight(40);
+        control.setSpacing(10.0);
+        control.setAlignment(Pos.BASELINE_CENTER);
+        Button start = new Button("start");
+        //start.setOnMouseClicked(event -> refresh(border));
 
 
-        Chess model = new Chess();
 
-        //BoardView boardview = new BoardView();
-        //BoardPresenter presenter = new BoardPresenter(model, boardview);
-        StartView view = new StartView();
-        StartPresenter startPresenter = new StartPresenter(model, view);
-        Scene scene = new Scene(view);
+        BoardView boardview = new BoardView();
+        BoardPresenter presenter = new BoardPresenter(controller, boardview);
+
+        Scene scene = new Scene(boardview, 800, 800);
 
         scene.getStylesheets().add("resources/stylesheet.css");
         primaryStage.setScene(scene);
@@ -49,7 +71,6 @@ public class Main extends Application {
 
         primaryStage.setTitle("Ultimate Chess");
         primaryStage.show();
-
 
 
     }
