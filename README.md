@@ -20,7 +20,7 @@
 ## Game attributes features
 ### Player
 - name
-- color
+- colo
 
 ### MoveManager
 - Keep a list of all moves
